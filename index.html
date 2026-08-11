@@ -309,7 +309,29 @@
 <section id="dashboard">
 
   <h2>Welcome to Socira 🎉</h2>
+  
+<div class="profile-editor">
 
+  <h3>Edit your profile</h3>
+
+  <input
+    type="text"
+    id="profileUsername"
+    placeholder="Username"
+  >
+
+  <textarea
+    id="profileBio"
+    placeholder="Tell people about yourself..."
+  ></textarea>
+
+  <button onclick="saveProfile()" class="primary">
+    Save profile
+  </button>
+
+  <p id="profileMessage"></p>
+
+</div>
   <p id="userEmail"></p>
 
   <p>
@@ -589,12 +611,71 @@
     if (data.session) {
 
       showDashboard(data.session.user);
+      document.getElementById("userEmail").textContent =
+  "Logged in as: " + user.email;
+      loadProfile(user);
 
     }
 
   }
 
+async function saveProfile() {
+  const username =
+    document.getElementById("profileUsername").value.trim();
 
+  const bio =
+    document.getElementById("profileBio").value.trim();
+
+  const message =
+    document.getElementById("profileMessage");
+
+  if (!username) {
+    message.textContent = "Please enter a username.";
+    return;
+  }
+
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    message.textContent = "Please log in first.";
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .update({
+      username: username,
+      bio: bio
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
+
+  message.textContent = "Profile saved successfully! 🎉";
+}
+  async function loadProfile(user) {
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("username, bio")
+    .eq("id", user.id)
+    .single();
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  document.getElementById("profileUsername").value =
+    data.username || "";
+
+  document.getElementById("profileBio").value =
+    data.bio || "";
+}
   checkSession();
 
 </script>
