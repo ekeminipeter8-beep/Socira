@@ -764,11 +764,12 @@ async function saveProfile() {
   }
 
   postsList.innerHTML = data.map(post => `
-    <div class="post-card">
-      <p>${escapeHtml(post.content)}</p>
-      <small>${new Date(post.created_at).toLocaleString()}</small>
-    </div>
-  `).join("");
+  <div class="post-card">
+    <p><strong>Socira User</strong></p>
+    <p>${escapeHtml(post.content)}</p>
+    <small>${new Date(post.created_at).toLocaleString()}</small>
+  </div>
+`).join("");
 }
 
 function escapeHtml(text) {
