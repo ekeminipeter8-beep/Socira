@@ -750,7 +750,7 @@ async function saveProfile() {
 
   const { data, error } = await supabaseClient
     .from("posts")
-    .select("id, user_id, content, created_at")
+    .select("Id, user_id, content, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
