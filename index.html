@@ -328,7 +328,33 @@
   <button onclick="saveProfile()" class="primary">
     Save profile
   </button>
+<div class="post-box">
 
+  <h3>Create a post</h3>
+
+  <textarea
+    id="postContent"
+    placeholder="What's on your mind?"
+    maxlength="500"
+  ></textarea>
+
+  <button onclick="createPost()" class="primary">
+    Post 🚀
+  </button>
+
+  <p id="postMessage"></p>
+
+</div>
+
+<div class="feed">
+
+  <h3>Socira Feed</h3>
+
+  <div id="postsList">
+    Loading posts...
+  </div>
+
+</div>
   <p id="profileMessage"></p>
 
 </div>
@@ -578,7 +604,9 @@
 
     document.getElementById("userEmail").textContent =
       "Logged in as: " + user.email;
-
+    
+     loadProfile(user);
+     loadPosts();
   }
 
 
@@ -675,6 +703,78 @@ async function saveProfile() {
 
   document.getElementById("profileBio").value =
     data.bio || "";
+}
+  async function createPost() {
+  const content =
+    document.getElementById("postContent").value.trim();
+
+  const message =
+    document.getElementById("postMessage");
+
+  if (!content) {
+    message.textContent = "Write something first.";
+    return;
+  }
+
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    message.textContent = "Please log in first.";
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("posts")
+    .insert({
+      user_id: user.id,
+      content: content
+    });
+
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
+
+  document.getElementById("postContent").value = "";
+  message.textContent = "Post published! 🎉";
+
+  loadPosts();
+}
+  async function loadPosts() {
+  const postsList =
+    document.getElementById("postsList");
+
+  postsList.textContent = "Loading posts...";
+
+  const { data, error } = await supabaseClient
+    .from("posts")
+    .select("id, user_id, content, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    postsList.textContent = error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    postsList.textContent = "No posts yet. Be the first! 🚀";
+    return;
+  }
+
+  postsList.innerHTML = data.map(post => `
+    <div class="post-card">
+      <p>${escapeHtml(post.content)}</p>
+      <small>${new Date(post.created_at).toLocaleString()}</small>
+    </div>
+  `).join("");
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
 }
   checkSession();
 
