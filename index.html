@@ -757,7 +757,17 @@ async function saveProfile() {
     postsList.textContent = error.message;
     return;
   }
+const userIds = [...new Set(data.map(post => post.user_id))];
 
+const { data: profiles, error: profileError } =
+  await supabaseClient
+    .from("profiles")
+    .select("Id, Username")
+    .in("Id", userIds);
+
+if (profileError) {
+  console.log(profileError);
+}
   if (!data || data.length === 0) {
     postsList.textContent = "No posts yet. Be the first! 🚀";
     return;
@@ -765,7 +775,10 @@ async function saveProfile() {
 
   postsList.innerHTML = data.map(post => `
   <div class="post-card">
-    <p><strong>Socira User</strong></p>
+    <p><strong>${
+  (profiles || []).find(profile => profile.Id === post.user_id)?.Username
+  || "Socira User"
+}</strong></p>
     <p>${escapeHtml(post.content)}</p>
     <small>${new Date(post.created_at).toLocaleString()}</small>
   </div>
