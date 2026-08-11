@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Socira — Connect. Create. Earn.</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
 
@@ -21,7 +22,6 @@
     }
 
     header {
-      width: 100%;
       padding: 20px;
       display: flex;
       justify-content: space-between;
@@ -32,41 +32,43 @@
     .logo {
       font-size: 28px;
       font-weight: bold;
-      letter-spacing: 1px;
     }
 
     .logo span {
       color: #7c5cff;
     }
 
-    .login {
+    button {
+      cursor: pointer;
+      border: none;
+    }
+
+    .login-btn {
       background: transparent;
       border: 1px solid #303b55;
       color: white;
-      padding: 10px 18px;
+      padding: 11px 20px;
       border-radius: 10px;
-      cursor: pointer;
     }
 
     .hero {
-      max-width: 1000px;
-      margin: auto;
-      padding: 90px 20px;
       text-align: center;
+      max-width: 900px;
+      margin: auto;
+      padding: 80px 20px;
     }
 
     .badge {
       display: inline-block;
-      padding: 8px 15px;
-      border-radius: 30px;
       background: #11182b;
       color: #9d8aff;
+      padding: 10px 17px;
+      border-radius: 30px;
       margin-bottom: 25px;
-      font-size: 14px;
     }
 
     h1 {
-      font-size: clamp(45px, 9vw, 82px);
+      font-size: clamp(45px, 9vw, 80px);
       line-height: 1;
       margin-bottom: 25px;
     }
@@ -76,11 +78,11 @@
     }
 
     .hero p {
-      max-width: 650px;
-      margin: auto;
       color: #9da7ba;
       font-size: 18px;
       line-height: 1.7;
+      max-width: 650px;
+      margin: auto;
     }
 
     .buttons {
@@ -94,12 +96,10 @@
     .primary {
       background: #7c5cff;
       color: white;
-      border: none;
       padding: 15px 25px;
       border-radius: 12px;
-      font-size: 16px;
       font-weight: bold;
-      cursor: pointer;
+      font-size: 16px;
     }
 
     .secondary {
@@ -109,7 +109,6 @@
       padding: 15px 25px;
       border-radius: 12px;
       font-size: 16px;
-      cursor: pointer;
     }
 
     .features {
@@ -140,108 +139,465 @@
     .card p {
       color: #8994a9;
       line-height: 1.6;
-      font-size: 14px;
     }
 
     footer {
       text-align: center;
-      padding: 60px 20px 30px;
       color: #657086;
-      font-size: 13px;
+      padding: 60px 20px 30px;
+    }
+
+    /* AUTH */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 420px;
+      background: #0d1322;
+      border: 1px solid #26334d;
+      border-radius: 20px;
+      padding: 30px;
+    }
+
+    .modal-box h2 {
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .modal-box p {
+      color: #8994a9;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: #070b14;
+      border: 1px solid #29344d;
+      border-radius: 10px;
+      color: white;
+      outline: none;
+    }
+
+    .auth-btn {
+      width: 100%;
+      padding: 14px;
+      background: #7c5cff;
+      color: white;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .close {
+      float: right;
+      background: transparent;
+      color: #aaa;
+      font-size: 24px;
+    }
+
+    .switch {
+      margin-top: 18px;
+      text-align: center;
+      color: #9d8aff;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-top: 15px;
+      color: #9d8aff;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    #dashboard {
+      display: none;
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    #dashboard h2 {
+      font-size: 40px;
+      margin-bottom: 15px;
+    }
+
+    #dashboard p {
+      color: #9da7ba;
+      margin-bottom: 25px;
+    }
+
+    .logout {
+      background: #e5484d;
+      color: white;
+      padding: 12px 22px;
+      border-radius: 10px;
     }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo">Soci<span>ra</span></div>
-    <button class="login" onclick="login()">Log in</button>
-  </header>
+<header>
+  <div class="logo">Soci<span>ra</span></div>
+  <button class="login-btn" onclick="openAuth('login')">Log in</button>
+</header>
 
-  <main>
+<section class="hero" id="home">
 
-    <section class="hero">
+  <div class="badge">🌐 The next generation social platform</div>
 
-      <div class="badge">🌐 The next generation social platform</div>
+  <h1>
+    Connect.<br>
+    Create. <span>Earn.</span>
+  </h1>
 
-      <h1>
-        Connect.<br>
-        Create. <span>Earn.</span>
-      </h1>
+  <p>
+    Welcome to Socira — a social-fi platform where people connect,
+    share content, build communities and unlock new digital opportunities.
+  </p>
 
-      <p>
-        Welcome to Socira — a social-fi platform where people connect,
-        share content, build communities and unlock new digital opportunities.
-      </p>
+  <div class="buttons">
+    <button class="primary" onclick="openAuth('signup')">
+      Join Socira 🚀
+    </button>
 
-      <div class="buttons">
-        <button class="primary" onclick="joinSocira()">
-          Join Socira 🚀
-        </button>
+    <button class="secondary" onclick="openAuth('login')">
+      Explore
+    </button>
+  </div>
 
-        <button class="secondary" onclick="learnMore()">
-          Explore
-        </button>
-      </div>
+</section>
 
-    </section>
+<section class="features" id="features">
 
-    <section class="features">
+  <div class="card">
+    <div class="icon">👥</div>
+    <h3>Connect</h3>
+    <p>Find people, follow creators and build meaningful communities.</p>
+  </div>
 
-      <div class="card">
-        <div class="icon">👥</div>
-        <h3>Connect</h3>
-        <p>
-          Find people, follow creators and build meaningful communities.
-        </p>
-      </div>
+  <div class="card">
+    <div class="icon">✨</div>
+    <h3>Create</h3>
+    <p>Share posts, ideas and content with your community.</p>
+  </div>
 
-      <div class="card">
-        <div class="icon">✨</div>
-        <h3>Create</h3>
-        <p>
-          Share posts, photos, ideas and content with your community.
-        </p>
-      </div>
+  <div class="card">
+    <div class="icon">💎</div>
+    <h3>Social-Fi</h3>
+    <p>Discover new ways to participate and unlock digital rewards.</p>
+  </div>
 
-      <div class="card">
-        <div class="icon">💎</div>
-        <h3>Social-Fi</h3>
-        <p>
-          Discover new ways to participate and unlock digital rewards.
-        </p>
-      </div>
+  <div class="card">
+    <div class="icon">🔒</div>
+    <h3>Your Identity</h3>
+    <p>Build your profile and take control of your digital identity.</p>
+  </div>
 
-      <div class="card">
-        <div class="icon">🔒</div>
-        <h3>Your Identity</h3>
-        <p>
-          Build your profile and take control of your digital social identity.
-        </p>
-      </div>
+</section>
 
-    </section>
+<section id="dashboard">
 
-  </main>
+  <h2>Welcome to Socira 🎉</h2>
 
-  <footer>
-    © 2026 Socira. Connect. Create. Earn.
-  </footer>
+  <p id="userEmail"></p>
 
-  <script>
-    function joinSocira() {
-      alert("Welcome to Socira! 🚀");
+  <p>
+    Your Socira account is ready.
+    More social features are coming next.
+  </p>
+
+  <button class="logout" onclick="logout()">Log out</button>
+
+</section>
+
+<footer>
+  © 2026 Socira. Connect. Create. Earn.
+</footer>
+
+<!-- AUTH MODAL -->
+
+<div class="modal" id="authModal">
+
+  <div class="modal-box">
+
+    <button class="close" onclick="closeAuth()">×</button>
+
+    <h2 id="authTitle">Join Socira</h2>
+
+    <p id="authDescription">
+      Create your Socira account.
+    </p>
+
+    <input
+      type="email"
+      id="email"
+      placeholder="Email address"
+    >
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Password"
+    >
+
+    <button class="auth-btn" onclick="submitAuth()" id="authButton">
+      Create account
+    </button>
+
+    <div class="switch" onclick="switchAuth()" id="switchText">
+      Already have an account? Log in
+    </div>
+
+    <div class="message" id="message"></div>
+
+  </div>
+
+</div>
+
+<script>
+
+  /* =========================
+     SUPABASE CONFIGURATION
+     ========================= */
+
+  const SUPABASE_URL =
+    "https://pucochojswjecqajsmyd.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+  const { createClient } = supabase;
+
+  const supabaseClient = createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+  let authMode = "signup";
+
+
+  /* =========================
+     AUTH MODAL
+     ========================= */
+
+  function openAuth(mode) {
+
+    authMode = mode;
+
+    document.getElementById("authModal").style.display = "flex";
+
+    document.getElementById("message").textContent = "";
+
+    updateAuthUI();
+  }
+
+
+  function closeAuth() {
+
+    document.getElementById("authModal").style.display = "none";
+
+  }
+
+
+  function switchAuth() {
+
+    authMode = authMode === "signup"
+      ? "login"
+      : "signup";
+
+    document.getElementById("message").textContent = "";
+
+    updateAuthUI();
+  }
+
+
+  function updateAuthUI() {
+
+    if (authMode === "signup") {
+
+      document.getElementById("authTitle").textContent =
+        "Join Socira 🚀";
+
+      document.getElementById("authDescription").textContent =
+        "Create your Socira account.";
+
+      document.getElementById("authButton").textContent =
+        "Create account";
+
+      document.getElementById("switchText").textContent =
+        "Already have an account? Log in";
+
+    } else {
+
+      document.getElementById("authTitle").textContent =
+        "Welcome back 👋";
+
+      document.getElementById("authDescription").textContent =
+        "Log in to your Socira account.";
+
+      document.getElementById("authButton").textContent =
+        "Log in";
+
+      document.getElementById("switchText").textContent =
+        "Don't have an account? Sign up";
+
     }
 
-    function login() {
-      alert("Socira login is coming soon.");
+  }
+
+
+  /* =========================
+     SIGN UP / LOGIN
+     ========================= */
+
+  async function submitAuth() {
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    const message =
+      document.getElementById("message");
+
+    if (!email || !password) {
+
+      message.textContent =
+        "Please enter your email and password.";
+
+      return;
     }
 
-    function learnMore() {
-      alert("More Socira features are coming soon.");
+    if (password.length < 6) {
+
+      message.textContent =
+        "Password must be at least 6 characters.";
+
+      return;
     }
-  </script>
+
+    message.textContent =
+      "Please wait...";
+
+
+    try {
+
+      if (authMode === "signup") {
+
+        const { data, error } =
+          await supabaseClient.auth.signUp({
+            email: email,
+            password: password
+          });
+
+        if (error) throw error;
+
+        if (data.session) {
+
+          showDashboard(data.user);
+
+        } else {
+
+          message.textContent =
+            "Account created! Check your email to confirm your account.";
+
+        }
+
+      } else {
+
+        const { data, error } =
+          await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
+
+        if (error) throw error;
+
+        showDashboard(data.user);
+
+      }
+
+    } catch (error) {
+
+      message.textContent =
+        error.message;
+
+    }
+
+  }
+
+
+  /* =========================
+     DASHBOARD
+     ========================= */
+
+  function showDashboard(user) {
+
+    closeAuth();
+
+    document.getElementById("home").style.display = "none";
+
+    document.getElementById("features").style.display = "none";
+
+    document.getElementById("dashboard").style.display = "block";
+
+    document.getElementById("userEmail").textContent =
+      "Logged in as: " + user.email;
+
+  }
+
+
+  /* =========================
+     LOGOUT
+     ========================= */
+
+  async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById("dashboard").style.display = "none";
+
+    document.getElementById("home").style.display = "block";
+
+    document.getElementById("features").style.display = "grid";
+
+  }
+
+
+  /* =========================
+     CHECK EXISTING SESSION
+     ========================= */
+
+  async function checkSession() {
+
+    const { data } =
+      await supabaseClient.auth.getSession();
+
+    if (data.session) {
+
+      showDashboard(data.session.user);
+
+    }
+
+  }
+
+
+  checkSession();
+
+</script>
 
 </body>
 </html>
