@@ -649,7 +649,7 @@ async function saveProfile() {
       username: username,
       bio: bio
     })
-    .eq("id", user.id);
+    .eq("Id", user.id);
 
   if (error) {
     message.textContent = error.message;
@@ -662,7 +662,7 @@ async function saveProfile() {
   const { data, error } = await supabaseClient
     .from("profiles")
     .select("username, bio")
-    .eq("id", user.id)
+    .eq("Id", user.id)
     .single();
 
   if (error) {
