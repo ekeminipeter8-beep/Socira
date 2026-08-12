@@ -750,7 +750,7 @@ async function saveProfile() {
 
   const { data, error } = await supabaseClient
     .from("posts")
-    .select("Id, user_id, content, created_at")
+    .select("id, user_id, content, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -762,7 +762,7 @@ const userIds = [...new Set(data.map(post => post.user_id))];
 const { data: profiles, error: profileError } =
   await supabaseClient
     .from("profiles")
-    .select("Id, Username")
+    .select("Id, username")
     .in("Id", userIds);
 
 if (profileError) {
@@ -776,7 +776,7 @@ if (profileError) {
   postsList.innerHTML = data.map(post => `
   <div class="post-card">
     <p><strong>${
-  (profiles || []).find(profile => profile.Id === post.user_id)?.Username
+  (profiles || []).find(profile => profile.Id === post.user_id)?.username
   || "Socira User"
 }</strong></p>
     <p>${escapeHtml(post.content)}</p>
