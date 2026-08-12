@@ -825,11 +825,7 @@ async function likePost(postId) {
       .from("likes")
       .delete()
       .eq("id", existingLike.id);
-
-    if (error) {
-      console.log(error);
-      return;
-    }
+    
   } else {
     const { error } = await supabaseClient
       .from("likes")
