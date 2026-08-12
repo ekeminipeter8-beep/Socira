@@ -820,11 +820,6 @@ async function likePost(postId) {
       .eq("user_id", user.id)
       .maybeSingle();
 
-  if (checkError) {
-    console.log(checkError);
-    return;
-  }
-
   if (existingLike) {
     const { error } = await supabaseClient
       .from("likes")
@@ -852,13 +847,6 @@ async function likePost(postId) {
   loadPosts();
 }
 
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  loadPosts();
-}
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
