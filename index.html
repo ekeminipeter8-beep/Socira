@@ -772,7 +772,21 @@ if (profileError) {
     postsList.textContent = "No posts yet. Be the first! 🚀";
     return;
   }
+const { data: likeCounts, error: likesError } =
+  await supabaseClient
+    .from("likes")
+    .select("post_id");
 
+if (likesError) {
+  console.log(likesError);
+}
+
+const likeCountByPost = {};
+
+(likeCounts || []).forEach(like => {
+  likeCountByPost[like.post_id] =
+    (likeCountByPost[like.post_id] || 0) + 1;
+});
   postsList.innerHTML = data.map(post => `
   <div class="post-card">
     <p><strong>${
@@ -781,7 +795,11 @@ if (profileError) {
 }</strong></p>
     <p>${escapeHtml(post.content)}</p>
     <small>${new Date(post.created_at).toLocaleString()}</small>
-  <button onclick="likePost('${post.id}')">❤️ Like</button>
+  <button onclick="likePost('${post.id}')">
+  ❤️ <span id="likes-${post.id}">
+  ${likeCountByPost[post.id] || 0} Likes
+</span>
+</button>
   </div>
 `).join("");
 }
