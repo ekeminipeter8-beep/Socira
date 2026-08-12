@@ -781,10 +781,32 @@ if (profileError) {
 }</strong></p>
     <p>${escapeHtml(post.content)}</p>
     <small>${new Date(post.created_at).toLocaleString()}</small>
+  <button onclick="likePost('${post.id}')">❤️ Like</button>
   </div>
 `).join("");
 }
+async function likePost(postId) {
+  const { data: { user } } = await supabaseClient.auth.getUser();
 
+  if (!user) {
+    alert("Please log in first.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("likes")
+    .insert({
+      post_id: postId,
+      user_id: user.id
+    });
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  loadPosts();
+}
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
