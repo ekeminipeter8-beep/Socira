@@ -638,13 +638,11 @@
 
     if (data.session) {
 
-      showDashboard(data.session.user);
-      document.getElementById("userEmail").textContent =
-  "Logged in as: " + user.email;
-      loadProfile(user);
+  const user = data.session.user;
 
-    }
+  showDashboard(user);
 
+}
   }
 
 async function saveProfile() {
@@ -833,12 +831,6 @@ async function likePost(postId) {
         post_id: postId,
         user_id: user.id
       });
-
-    if (error) {
-      console.log(error);
-      return;
-    }
-  }
 
   loadPosts();
 }
